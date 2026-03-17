@@ -6,10 +6,12 @@
 x402-facilitator-spark/
 ├── package.json
 ├── tsconfig.json
+├── .nvmrc                          # Node >= 20.6.0 required (Spark SDK gRPC dependency)
 ├── design.md
 ├── PLAN.md
 ├── src/
 │   ├── types.ts                    # Spark-specific x402 types
+│   ├── generate-wallets.ts         # Utility to create testnet/mainnet wallet mnemonics
 │   ├── facilitator/
 │   │   ├── index.ts                # Express server with /verify, /settle, /supported
 │   │   ├── sparkExactFacilitator.ts # SchemeNetworkFacilitator implementation

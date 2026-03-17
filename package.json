@@ -6,7 +6,8 @@
   "scripts": {
     "facilitator": "tsx src/facilitator/index.ts",
     "server": "tsx src/server/index.ts",
-    "client": "tsx src/client/index.ts"
+    "client": "tsx src/client/index.ts",
+    "generate-wallets": "tsx src/generate-wallets.ts"
   },
   "keywords": [
     "x402",

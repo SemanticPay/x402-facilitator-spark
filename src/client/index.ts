@@ -51,29 +51,28 @@ async function main() {
   }
 
   const requirements: PaymentRequirements = paymentRequired.accepts[0];
+  const sparkInvoice = requirements.extra.sparkInvoice;
+
   console.log(`  Scheme: ${requirements.scheme}`);
   console.log(`  Network: ${requirements.network}`);
   console.log(`  Amount: ${requirements.amount} sats`);
   console.log(`  Pay to: ${requirements.payTo}`);
-  console.log(`  Payment ID: ${requirements.extra.paymentId}`);
+  console.log(`  Invoice: ${sparkInvoice.slice(0, 30)}...`);
 
-  // Step 2: Pay via Spark
-  console.log(`\nPaying ${requirements.amount} sats via Spark...`);
+  // Step 2: Pay the invoice
+  console.log(`\nPaying ${requirements.amount} sats via Spark invoice...`);
 
-  let transferId: string;
   try {
-    // Use fulfillSparkInvoice if we got an invoice back, otherwise direct transfer
-    const payTo = requirements.payTo;
-    const amount = parseInt(requirements.amount, 10);
-
-    const result = await wallet.transfer({
-      receiverSparkAddress: payTo,
-      amountSats: amount,
-    });
-
-    // The transfer result contains the transfer info
-    transferId = result.id;
-    console.log(`Payment sent! Transfer ID: ${transferId}`);
+    const result = await wallet.fulfillSparkInvoice([{ invoice: sparkInvoice as `${string}1${string}` }]);
+    console.log("Payment sent!");
+    if (result.satsTransactionErrors?.length) {
+      console.error("Payment errors:", result.satsTransactionErrors);
+      return;
+    }
+    if (result.invalidInvoices?.length) {
+      console.error("Invalid invoices:", result.invalidInvoices);
+      return;
+    }
   } catch (err) {
     console.error("Payment failed:", err);
     return;
@@ -88,7 +87,7 @@ async function main() {
     accepted: requirements,
     payload: {
       paymentType: "SPARK",
-      transfer_id: transferId,
+      sparkInvoice,
     },
   };
 
@@ -103,7 +102,6 @@ async function main() {
   console.log(`Response status: ${retryResp.status}`);
 
   if (retryResp.status === 200) {
-    // Decode X-PAYMENT-RESPONSE
     const xPaymentResponse = retryResp.headers.get("x-payment-response");
     if (xPaymentResponse) {
       const decoded: SparkPaymentResponse = JSON.parse(
@@ -112,8 +110,7 @@ async function main() {
       console.log("\nX-PAYMENT-RESPONSE:");
       console.log(`  Success: ${decoded.success}`);
       console.log(`  Network: ${decoded.network}`);
-      console.log(`  Payment type: ${decoded.paymentType}`);
-      console.log(`  Transfer ID: ${decoded.transfer_id || "N/A"}`);
+      console.log(`  Invoice: ${decoded.sparkInvoice.slice(0, 30)}...`);
     }
 
     const body = await retryResp.json();

@@ -1,26 +1,25 @@
 {
   "name": "x402-facilitator-spark",
   "version": "1.0.0",
-  "description": "x402 facilitator supporting Spark (Bitcoin L2) invoices as a payment scheme",
+  "description": "x402 payment server using Spark (Bitcoin L2) invoices",
   "type": "module",
   "scripts": {
-    "facilitator": "tsx src/facilitator/index.ts",
     "server": "tsx src/server/index.ts",
     "client": "tsx src/client/index.ts",
-    "generate-wallets": "tsx src/generate-wallets.ts"
+    "generate-wallets": "tsx src/generate-wallets.ts",
+    "test": "tsx src/test/integration.ts"
   },
   "keywords": [
     "x402",
     "spark",
     "bitcoin",
-    "facilitator"
+    "payment"
   ],
   "license": "ISC",
   "dependencies": {
     "@buildonspark/spark-sdk": "^0.7.1",
     "dotenv": "^17.3.1",
-    "express": "^5.2.1",
-    "light-bolt11-decoder": "^3.2.0"
+    "express": "^5.2.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
